@@ -54,12 +54,12 @@ export default function UserData() {
         <p>Hobby : {profile?.hobby.join(" , ")}</p>
         <p>DOB : {formatPostCreatedAt(profile?.dateOfBirth)}</p>
 
-        {/* <Link
-          to={`/user/signup/${profile?.id}`}
+        <Link
+          to={`user/signup/${profile?.id}`}
           className="underline decoration-1 text-indigo-600"
         >
           edit your profile
-        </Link> */}
+        </Link>
         <br />
         <Link
           to={"/user/changePassword"}

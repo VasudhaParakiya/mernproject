@@ -59,6 +59,7 @@ const AllRoutes = () => {
             <Route path="createPost" element={<Post />} />
             <Route path="createPost/:id" element={<Post />} />
             <Route path="profile" element={<UserData />} />
+            <Route path="signup/:id" element={<SignUp />} />
             <Route path="changePassword" element={<ChangePassword />} />
             {/* <Route path="*" element={<PageNotFound />} /> */}
           </Route>
