@@ -57,6 +57,7 @@ export default function Post() {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm();
 
   useEffect(() => {
@@ -67,6 +68,10 @@ export default function Post() {
       setValue("description", getPost?.description);
     }
   }, [postData]);
+
+  const handleReset = () => {
+    reset();
+  };
 
   const formSubmit = (data) => {
     try {
@@ -112,7 +117,7 @@ export default function Post() {
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Create your Post
+            {id ? "Update Post" : "Create New Post"}
           </h2>
         </div>
 
@@ -150,14 +155,19 @@ export default function Post() {
               }}
               errorMessage={errors?.description?.message}
             />
-
-            <Button
-              className={
-                "flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              }
-              type={"submit"}
-              btnName={id ? "Update" : "Submit"}
-            />
+            <button
+              type="reset"
+              className="bg-indigo-600 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              onClick={handleReset}
+            >
+              Reset
+            </button>
+            <button
+              type="submit"
+              className="bg-indigo-600 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+            >
+              {id ? "Update" : "Submit"}
+            </button>
           </form>
         </div>
       </div>

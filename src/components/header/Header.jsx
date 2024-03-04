@@ -39,8 +39,7 @@ export default function Header() {
   const logoutHandler = () => {
     try {
       localStorage.clear();
-      // localStorage.removeItem("token");
-      // localStorage.removeItem("role");
+     
       navigate("/login");
     } catch (error) {
       console.error("Error navigating to login page:", error);

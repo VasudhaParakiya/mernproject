@@ -20,16 +20,29 @@ const LOGIN = gql`
     }
   }
 `;
+
+const AGAIN_VERIFY = gql`
+  mutation TokenExpireAndVerifyUser($email: String) {
+    tokenExpireAndVerifyUser(email: $email) {
+      isVerified
+    }
+  }
+`;
 const Login = () => {
   const [LoginUser] = useMutation(LOGIN);
+  // const [TokenExpireAndVerifyUser, { data }] = useMutation(AGAIN_VERIFY);
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
+  const handleReset = () => {
+    reset();
+  };
   const formSubmit = (data) => {
     // console.log(data);
     LoginUser({
@@ -42,9 +55,10 @@ const Login = () => {
         // console.log(res.data.loginUser);
 
         const loginData = res?.data?.loginUser;
+        const token = loginData?.accessToken;
 
-        if (loginData.active && loginData.isVerified) {
-          const token = res?.data?.loginUser?.accessToken;
+        if (loginData.active && loginData.isVerified === true) {
+          // const token = res?.data?.loginUser?.accessToken;
           const role = res?.data?.loginUser?.role;
 
           if (token) {
@@ -52,22 +66,22 @@ const Login = () => {
             localStorage.setItem("role", JSON.stringify(role));
             toast.success("login successfully");
             if (loginData.role === "admin") return navigate("/admin");
-            // if (loginData.role === "user") return navigate("/user");
+
             if (loginData.role === "user") return navigate("/user");
           } else {
             console.log("please verify in your email");
+            if (err.message === "not verified") {
+              navigate("/loginVerify/:token");
+              // send email with token
+            }
             toast.error(err.message);
           }
         }
-
-        // console.log("🚀 ~ .then ~ loginData:", loginData.active, typeof loginData.active)
-        if (!loginData.active) {
-          toast.error("user not active");
-        } else {
-          toast.error("user not verify");
-        }
       })
-      .catch((err) => toast.error(err.message));
+      .catch((err) => {
+        console.log("🚀 ~ formSubmit ~ err:", err);
+        return toast.error(err.message);
+      });
   };
   return (
     <>
@@ -147,8 +161,15 @@ const Login = () => {
 
             <div>
               <button
+                type="reset"
+                className="bg-indigo-600 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+              <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="bg-indigo-600 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
                 Sign in
               </button>
@@ -163,16 +184,6 @@ const Login = () => {
               create your account
             </Link>
           </div>
-
-          {/* <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?
-            <a
-              href="#"
-              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-            >
-              Start a 14 day free trial
-            </a>
-          </p> */}
         </div>
       </div>
     </>

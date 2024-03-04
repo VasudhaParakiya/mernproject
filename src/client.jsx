@@ -39,6 +39,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         localStorage.clear();
         window.location.replace("/login");
       }
+      
     });
   }
   if (networkError) {

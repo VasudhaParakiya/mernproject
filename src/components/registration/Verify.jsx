@@ -1,7 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "react-toastify";
 
 const VERIFIED_USER = gql`
   mutation VerifyUser($token: String!) {
@@ -14,54 +15,60 @@ const VERIFIED_USER = gql`
 const Verify = () => {
   const navigate = useNavigate();
   const { token } = useParams();
-
+  console.log("🚀 ~ Verify ~ token:", token);
+  let isVerified;
   //   const [isVerified, setIsVerifird] = useState(false);
-  const [VerifyUser] = useMutation(VERIFIED_USER);
+  const [VerifyUser, { loading, data, error }] = useMutation(VERIFIED_USER);
+  // console.log("🚀 ~ Verify ~ data:", data);
+  // console.log("🚀 ~ Verify ~ error ~ error:", error);
 
-  const handleVerified = async (e) => {
-    e.preventDefault();
-    // const response = await VerifyUser({
-    //   variables: {
-    //     token: token,
-    //   },
-    // });
-    // console.log(response.data.verifyUser.isVerified);
-
-    // const isVerified = response.data.verifyUser.isVerified;
-    // if (isVerified === true) navigate("/login");
-
-    VerifyUser({
-      variables: {
-        token: token,
-      },
-    })
-      .then((res) => {
-        console.log(res.data.verifyUser.isVerified);
-        const isVerified = res.data.verifyUser.isVerified;
-        if (isVerified === true) navigate("/login");
+  useEffect(() => {
+    try {
+      VerifyUser({
+        variables: {
+          token: token,
+        },
       })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+        .then((res) => {
+          console.log(res.data.verifyUser.isVerified);
+          isVerified = res.data.verifyUser.isVerified;
+          toast.success("verify successfully. please login");
+          // if (isVerified === true) navigate("/login");
+        })
+        .catch((err) => {
+          console.log("🚀 ~ handleVerified ~ err:", err.message);
+          if (err.message === "jwt expired") {
+            navigate("/expireMsg");
+          }
+          toast.error("jwt expired");
+        });
+    } catch (error) {
+      console.log("🚀 ~ useEffect ~ error:", error);
 
+      console.log(error.message);
+    }
+  }, []);
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    navigate("/login");
+  };
   return (
     <>
-      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Are You Verify ???
-          </h2>
-        </div>
-        <div className="flex justify-center w-64">
-          <button
-            type="submit"
-            className="flex  justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            onClick={handleVerified}
-          >
-            verify
-          </button>
-        </div>
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {data && (
+          <>
+            <p>your verification successfully.</p>
+            <p>please login</p>
+            <button
+              type="submit"
+              className="bg-indigo-600 inline-block mt-4 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+              onClick={handleClick}
+            >
+              login
+            </button>
+          </>
+        )}
       </div>
     </>
   );

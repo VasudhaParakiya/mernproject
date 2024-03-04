@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { formatPostCreatedAt } from "../../utils/formateDate";
 import Paginate from "../../pagination/Paginate";
+import { debounce } from "lodash";
+import ContentLoader from "react-content-loader";
 
 import { useForm } from "react-hook-form";
+import Pagination from "../../pagination/Pagination";
 
 const QUERY_ALL_USER = gql`
   query GetUsersByAdmin($input: paginateUserInput!) {
@@ -48,12 +51,15 @@ const DELETE_USER_BY_ADMIN = gql`
 export default function AllUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
   const [sortBy, setSortBy] = useState({ column: "createdAt", order: "asc" });
+  const limit = 5;
 
-  const { data, refetch, error } = useQuery(QUERY_ALL_USER, {
+  const { data, refetch, error, loading } = useQuery(QUERY_ALL_USER, {
     variables: {
       input: {
-        limit: 5,
+        limit: limit,
         page: currentPage,
         column: sortBy.column,
         order: sortBy.order,
@@ -79,33 +85,51 @@ export default function AllUser() {
             : "asc"
           : "asc",
     });
+    setCurrentPage(1);
   };
 
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected + 1);
+  const handlePageChange = (selected) => {
+    setCurrentPage(selected);
+  };
+
+  // Debounce the handleSearch function
+  const debouncedSearch = debounce((text) => {
+    setSearchText(text); // Update searchText state after debounce
+  }, 1000);
+
+  const handleSearch = (e) => {
+    const text = e.target.value;
+    debouncedSearch(text);
+    setCurrentPage(1); // Call the debounced function with the input text
   };
 
   const deleteUserHandler = async (id) => {
     try {
-      await DeleteUserByAdmin({
-        variables: {
-          deleteUserByAdminId: id,
-        },
-      })
-        .then((res) => {
-          console.log("🚀 ~ .then ~ res:", res);
-          refetch();
-          toast.success("user deleted successfully");
+      const isConfirm = window.confirm("sure, are you went to delete????");
+      // console.log("🚀 ~ deleteUserHandler ~ isConfirm:", isConfirm);
+      if (isConfirm) {
+        await DeleteUserByAdmin({
+          variables: {
+            deleteUserByAdminId: id,
+          },
         })
-        .catch((error) => {
-          console.log(error.message);
-          toast.error(error.message);
-        });
+          .then((res) => {
+            console.log("🚀 ~ .then ~ res:", res);
+            refetch();
+            toast.success("user deleted successfully");
+          })
+          .catch((error) => {
+            console.log(error.message);
+            toast.error(error.message);
+          });
+      }
     } catch (error) {
       console.log(error.message);
       toast.error(error.message);
     }
   };
+
+  if (loading) return <ContentLoader />;
 
   return (
     <>
@@ -114,28 +138,62 @@ export default function AllUser() {
           <input
             type="text"
             placeholder="Search..."
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={handleSearch}
+            // onChange={(e) => {
+            //   setSearchText(e.target.value);
+            //   setCurrentPage(1);
+            // }}
             className="border px-2 me-2"
             autoComplete="false"
           />
         </div>
 
-        {allUser ? (
+        {error ? (
+          error.message === "No matching users found please search again" && (
+            <>
+              <h1>No matching users found please search again</h1>
+            </>
+          )
+        ) : allUser?.length ? (
           <>
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
               <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                 All User
               </h2>
             </div>
-
             <table className="mt-3">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort("firstName")}>FirstName</th>
-                  <th onClick={() => handleSort("lastName")}>LastName</th>
-                  <th onClick={() => handleSort("email")}>Email</th>
-                  <th onClick={() => handleSort("gender")}>Gender</th>
-                  <th onClick={() => handleSort("hobby")}>Hobby</th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("firstName")}
+                  >
+                    FirstName
+                  </th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("lastName")}
+                  >
+                    LastName
+                  </th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("email")}
+                  >
+                    Email
+                  </th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("gender")}
+                  >
+                    Gender
+                  </th>
+                  <th
+                    className="cursor-pointer"
+                    onClick={() => handleSort("hobby")}
+                  >
+                    Hobby
+                  </th>
                   <th onClick={() => handleSort("dateOfBirth")}>DOB</th>
                   <th>Post</th>
                   <th>Action</th>
@@ -162,7 +220,7 @@ export default function AllUser() {
                       <td>
                         {/* <Link to={`viewUser/${user?.id}`}>read</Link> */}
                         <Link
-                          to={`signup/${user?.id}`}
+                          to={`updateUser/${user?.id}`}
                           className="mx-2 inline-block underline decoration-1 text-indigo-600"
                         >
                           edit
@@ -180,13 +238,17 @@ export default function AllUser() {
                 })}
               </tbody>
             </table>
+
+            <Pagination
+              pageCount={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
           </>
         ) : (
           "No user data"
         )}
       </div>
-      {/* { pageCount, onPageChange }  */}
-      <Paginate pageCount={totalPages} onPageChange={handlePageChange} />
     </>
   );
 }

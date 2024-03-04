@@ -26,6 +26,7 @@ const SINGLE_USER = gql`
 `;
 
 export default function UserData() {
+  const role = JSON.parse(localStorage.getItem("role"));
   const { loading, data, error, refetch } = useQuery(SINGLE_USER, {
     fetchPolicy: "network-only",
   });
@@ -54,15 +55,16 @@ export default function UserData() {
         <p>Hobby : {profile?.hobby.join(" , ")}</p>
         <p>DOB : {formatPostCreatedAt(profile?.dateOfBirth)}</p>
 
-        <Link
-          to={`user/signup/${profile?.id}`}
+        {/* <Link
+          to={`userProfile/${profile?.id}`}
           className="underline decoration-1 text-indigo-600"
         >
           edit your profile
-        </Link>
+        </Link> */}
         <br />
         <Link
-          to={"/user/changePassword"}
+          // to={"/user/changePassword"}
+          to={`/${role}/changePassword`}
           className="underline decoration-1 text-indigo-600"
         >
           change password

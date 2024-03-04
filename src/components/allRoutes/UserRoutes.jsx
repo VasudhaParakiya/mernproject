@@ -12,14 +12,17 @@ export default function UserRoutes() {
   const authToken = authTokenForRoutes();
   return (
     authToken && (
+     
       <Routes>
-        <Route path="/" element={<AllPost />} />
+        <Route index element={<AllPost />} />
         <Route path="createPost" element={<Post />} />
-        <Route path="createPost/:id" element={<Post />} />
+        <Route path="updatePost/:id" element={<Post />} />
         <Route path="profile" element={<UserData />} />
         <Route path="changePassword" element={<ChangePassword />} />
         <Route path="*" element={<PageNotFound />} />
+        
       </Routes>
     )
   );
 }
+

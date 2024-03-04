@@ -37,23 +37,31 @@ export default function ConfirmPassword() {
   password.current = watch("password", "");
 
   const formSubmit = (data) => {
-    console.log("🚀 ~ ConfirmPassword ~ data:", data);
-    try {
-      ConfirmPassword({
-        variables: {
-          input: { ...data },
-          token: token,
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          navigate("/login");
-          toast.success("password change successfully");
+    // console.log("🚀 ~ ConfirmPassword ~ data:", data);
+    const { newPassword, confirmPassword } = data;
+    if (newPassword === confirmPassword) {
+      try {
+        ConfirmPassword({
+          variables: {
+            input: { ...data },
+            token: token,
+          },
         })
-        .catch((err) => console.log(err));
-    } catch (error) {
-      console.log("🚀 ~ formSubmit ~ error:", error);
-      toast.error(error.message);
+          .then((res) => {
+            // console.log(res.data);
+            navigate("/login");
+            toast.success("password change successfully");
+          })
+          .catch((err) => {
+            console.log("🚀 ~ formSubmit ~ err:", err.message);
+            toast.error(err.message);
+          });
+      } catch (error) {
+        console.log("🚀 ~ formSubmit ~ error:", error);
+        toast.error(error.message);
+      }
+    } else {
+      toast.error("newPassword and confirmPassword not match");
     }
   };
   return (
@@ -95,8 +103,7 @@ export default function ConfirmPassword() {
               placeholder="Confirm Password..."
               register={{
                 ...register("confirmPassword", {
-                  validate: (value) =>
-                    value === password.current || "The passwords do not match",
+                  required: "Confirm Password is required",
                 }),
               }}
               errorMessage={errors?.confirmPassword?.message}
@@ -107,7 +114,7 @@ export default function ConfirmPassword() {
                 "flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               }
               type={"submit"}
-              btnName={"Submit"}
+              btnName={"Change Password"}
             />
           </form>
         </div>

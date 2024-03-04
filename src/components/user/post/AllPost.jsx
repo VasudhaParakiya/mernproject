@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Paginate from "../../pagination/Paginate";
+import Pagination from "../../pagination/Pagination";
 
 const QUERY_ALL_POST = gql`
   query Docs($input: paginateInput!) {
@@ -38,10 +39,11 @@ const DELETE_POST = gql`
 export default function AllPost() {
   // const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const limit = 5;
   const { loading, data, refetch, error } = useQuery(QUERY_ALL_POST, {
     variables: {
       input: {
-        limit: 5,
+        limit: limit,
         page: currentPage,
       },
     },
@@ -56,30 +58,34 @@ export default function AllPost() {
 
   // console.log("🚀 ~ AllPost ~ data:", data);
   const allPost = data?.getAllPost?.docs;
+  console.log("🚀 ~ AllPost ~ allPost:", allPost?.length);
   const totalPages = data?.getAllPost?.totalPages || 0;
 
   // Function to handle page change
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected + 1);
+  const handlePageChange = (selected) => {
+    setCurrentPage(selected);
   };
 
   // delete post
   const deletePostData = async (id) => {
     try {
-      await DeletePost({
-        variables: {
-          deletePostId: id,
-        },
-      })
-        .then((res) => {
-          // console.log("🚀 ~ .then ~ res:", res);
-          refetch();
-          toast.success("post delete successfully");
+      const isConfirm = window.confirm("sure, are you went to delete???");
+      if (isConfirm) {
+        await DeletePost({
+          variables: {
+            deletePostId: id,
+          },
         })
-        .catch((error) => {
-          console.log(error.message);
-          toast.error(error.message);
-        });
+          .then((res) => {
+            // console.log("🚀 ~ .then ~ res:", res);
+            refetch();
+            toast.success("post delete successfully");
+          })
+          .catch((error) => {
+            console.log(error.message);
+            toast.error(error.message);
+          });
+      }
     } catch (error) {
       // console.log("deletePostData", error.message);
       toast.error(error.message);
@@ -104,45 +110,53 @@ export default function AllPost() {
             + Post
           </Link>
         </div>
+        {allPost?.length ? (
+          <>
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+              <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                {data?.getAllPost ? "Post Data" : " No Post Added"}
+              </h2>
+            </div>
 
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            {data?.getAllPost ? "Post Data" : " No Post Added"}
-          </h2>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Created By</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allPost?.map((post) => {
-              return (
-                <tr key={post?.id}>
-                  <td>{post?.title}</td>
-                  <td>{post?.description}</td>
-                  <td>{post?.createdBy?.firstName}</td>
-                  <td>
-                    <Link to={`createPost/${post?.id}`} className="me-2">
-                      edit
-                    </Link>
-                    <Link to={"#"} onClick={() => deletePostData(post?.id)}>
-                      delete
-                    </Link>
-                  </td>
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Description</th>
+                  <th>Created By</th>
+                  <th>Action</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {allPost?.map((post) => {
+                  return (
+                    <tr key={post?.id}>
+                      <td>{post?.title}</td>
+                      <td>{post?.description}</td>
+                      <td>{post?.createdBy?.firstName}</td>
+                      <td>
+                        <Link to={`updatePost/${post?.id}`} className="me-2">
+                          edit
+                        </Link>
+                        <Link to={"#"} onClick={() => deletePostData(post?.id)}>
+                          delete
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
-        {/* { pageCount, onPageChange }  */}
-        <Paginate pageCount={totalPages} onPageChange={handlePageChange} />
+            <Pagination
+              pageCount={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </>
+        ) : (
+          "No post add"
+        )}{" "}
       </div>
     </>
   );

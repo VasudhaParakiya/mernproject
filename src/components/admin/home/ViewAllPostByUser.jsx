@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import Paginate from "../../pagination/Paginate";
+import Pagination from "../../pagination/Pagination";
 
 const ALL_POST_OF_ONE_USER = gql`
   query GetAllPostOneUserByAdmin(
@@ -43,8 +44,8 @@ export default function ViewAllPostByUser() {
   const totalPages = data?.getAllPostOneUserByAdmin?.totalPages || 0;
 
   // Function to handle page change
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected + 1);
+  const handlePageChange = (selected) => {
+    setCurrentPage(selected);
   };
 
   return (
@@ -87,7 +88,11 @@ export default function ViewAllPostByUser() {
               </tbody>
             </table>
 
-            <Paginate pageCount={totalPages} onPageChange={handlePageChange} />
+            <Pagination
+              pageCount={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
           </div>
         </>
       ) : (

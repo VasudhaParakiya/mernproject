@@ -5,7 +5,7 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 
 const UPLOAD_PHOTO = gql`
-  mutation UploadProfilePhoto($input: uploadProfileInput) {
+  mutation UploadProfilePhoto($input: uploadProfileInput!) {
     uploadProfilePhoto(input: $input) {
       profile
     }
@@ -49,8 +49,6 @@ export default function UploadProfile() {
     // console.log("🚀 ~ UploadProfile ~ profileData:", data);
   }, [GetProfilePhoto]);
 
-  
-
   // profile image conver to base 64
   const getBase64 = (file) => {
     return new Promise((resolve) => {
@@ -88,7 +86,9 @@ export default function UploadProfile() {
     try {
       UploadProfilePhoto({
         variables: {
-          input: { url: file },
+          input: {
+            url: file,
+          },
         },
       })
         .then((res) => {

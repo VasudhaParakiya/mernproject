@@ -33,53 +33,62 @@ import AllPost from "../user/post/AllPost";
 import Post from "../user/post/Post";
 import ChangePassword from "../login/ChangePassword";
 import authTokenForRoutes from "../auth/authTokenForRoutes";
+import ExpireMsg from "../registration/expireMsg";
 
 const AllRoutes = () => {
-  const authToken = authTokenForRoutes();
+  // const authToken = authTokenForRoutes();
 
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
-        <Route path="/forgotPassword/:token" element={<ConfirmPassword />} />
+        <Route path="/forgotPassword/:token" element={<ConfirmPassword />} /> */}
         {/* <Route
           path="/updateUserByAdmin/:token"
           element={<UpdateUserByAdmin />}
         /> */}
-
+        {/* <Route path="/loginVerify/:token" element={<Verify />} />
+        <Route path="/expireMsg" element={<ExpireMsg />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/signup/:token" element={<Verify />} />
+        <Route path="/userVerify/:token" element={<Verify />} /> */}
+        {/* <Route path="/signup/:id" element={<SignUp />} /> */}
 
         {/*---------------- user routes-----------------------  */}
-        {authToken && (
-          <Route path="/user">
-            <Route index element={<AllPost />} />
-            <Route path="createPost" element={<Post />} />
-            <Route path="createPost/:id" element={<Post />} />
-            <Route path="profile" element={<UserData />} />
-            <Route path="signup/:id" element={<SignUp />} />
-            <Route path="changePassword" element={<ChangePassword />} />
-            {/* <Route path="*" element={<PageNotFound />} /> */}
-          </Route>
-        )}
+        {/* {authToken && ( */}
+        {/* <Route path="/user">
+          <Route index element={<AllPost />} />
+          <Route path="createPost" element={<Post />} />
+          <Route path="updatePost/:id" element={<Post />} />
+          <Route path="profile" element={<UserData />} />
+          <Route path="userProfile/:id" element={<SignUp />} />
+          <Route path="changePassword" element={<ChangePassword />} /> */}
+        {/* <Route path="*" element={<PageNotFound />} /> */}
+        {/* </Route> */}
+        {/* )} */}
 
         {/*------------------ admin routes------------------------------ */}
-        {authToken && (
-          <Route path="/admin">
-            <Route index element={<AllUser />} />
-            <Route path="signup/:id" element={<SignUp />} />
-            {/* <Route path="viewUser/:id" element={<ViewUser />} /> */}
-            <Route
-              path="viewAllPostByUser/:id"
-              element={<ViewAllPostByUser />}
-            />
-            <Route path="profile" element={<UserData />} />
-            <Route path="allPostByAdmin" element={<AllPostByAdmin />} />
-            <Route path="*" element={<PageNotFound />} />
-          </Route>
-        )}
+        {/* {authToken && ( */}
+        {/* <Route path="/admin">
+          <Route index element={<AllUser />} />
+          <Route path="updateUser/:id" element={<SignUp />} /> */}
+        {/* <Route path="viewUser/:id" element={<ViewUser />} /> */}
+        {/* <Route path="viewAllPostByUser/:id" element={<ViewAllPostByUser />} />
+          <Route path="profile" element={<UserData />} />
+          <Route path="allPostByAdmin" element={<AllPostByAdmin />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Route> */}
+        {/* )} */}
+
+        <Route path="*" element={<PublicRoutes />} />
+        <Route path="/user/*" element={<UserRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        <Route path="/forgotPassword/:token" element={<ConfirmPassword />} />
+        <Route path="/loginVerify/:token" element={<Verify />} />
+        <Route path="/expireMsg" element={<ExpireMsg />} />
+        <Route path="/userVerify/:token" element={<Verify />} />
 
         <Route path="*" element={<PageNotFound />} />
       </Routes>

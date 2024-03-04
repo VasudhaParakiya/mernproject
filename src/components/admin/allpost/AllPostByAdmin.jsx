@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import Paginate from "../../pagination/Paginate";
-
+import Pagination from "../../pagination/Pagination";
 
 const GET_ALL_POST_BY_ADMIN = gql`
   query GetAllPostByAdmin($input: paginateInput!) {
@@ -26,7 +26,6 @@ const GET_ALL_POST_BY_ADMIN = gql`
   }
 `;
 
-
 export default function AllPostByAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const { data } = useQuery(GET_ALL_POST_BY_ADMIN, {
@@ -42,8 +41,8 @@ export default function AllPostByAdmin() {
   const totalPages = data?.getAllPostByAdmin?.totalPages || 0;
 
   // Function to handle page change
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected + 1);
+  const handlePageChange = (selected) => {
+    setCurrentPage(selected);
   };
 
   return (
@@ -51,7 +50,7 @@ export default function AllPostByAdmin() {
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            All User
+            All Post
           </h2>
         </div>
 
@@ -77,8 +76,11 @@ export default function AllPostByAdmin() {
           </tbody>
         </table>
 
-        {/* { pageCount, onPageChange }  */}
-        <Paginate pageCount={totalPages} onPageChange={handlePageChange} />
+        <Pagination
+          pageCount={totalPages}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
       </div>
     </>
   );

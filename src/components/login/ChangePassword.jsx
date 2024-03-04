@@ -19,6 +19,8 @@ const QUERY_CHANGE_PASSWORD = gql`
 
 export default function ChangePassword() {
   const navigate = useNavigate();
+  const role = JSON.parse(localStorage.getItem("role"));
+  
   const [ChangePassword] = useMutation(QUERY_CHANGE_PASSWORD);
   // console.log("🚀 ~ ChangePassword ~ data:", data);
 
@@ -38,7 +40,9 @@ export default function ChangePassword() {
       })
         .then((res) => {
           console.log(res);
+
           // navigate("/user/profile");
+          navigate(`/${role}/profile`);
 
           toast.success("password change successfully");
         })

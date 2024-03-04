@@ -101,6 +101,10 @@ const SignUp = () => {
     }
   }, [queryData, id]);
 
+  const handleReset = () => {
+    reset();
+  };
+
   const formSubmit = (data) => {
     console.log("===121🚀 ~ formSubmit ~ data:", data);
 
@@ -128,9 +132,9 @@ const SignUp = () => {
         })
           .then((res) => {
             console.log(res.data);
-            
+
             navigate("/admin");
-            toast.success("user edit successfully");
+            toast.success("user edit successfully and send mail for user");
           })
           .catch((err) => {
             console.log(err);
@@ -149,7 +153,9 @@ const SignUp = () => {
         })
           .then((res) => {
             console.log(res.data.createUser);
-            toast.success("user sign up successfully");
+            toast.success(
+              "user sign up successfully please check your email and verify"
+            );
           })
           .catch((err) => {
             console.log(err);
@@ -169,7 +175,7 @@ const SignUp = () => {
         {error && <div>console.error(.message)</div>}
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign Up
+            {id ? "Update User" : "Sign Up"}
           </h2>
         </div>
 
@@ -442,8 +448,15 @@ const SignUp = () => {
             {/* button  */}
             <div>
               <button
+                type="reset"
+                className="bg-indigo-600 text-white hover:bg-indigo-500 me-3 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+              <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="bg-indigo-600 text-white hover:bg-indigo-500 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
               >
                 {id ? "Update" : "Sign Up"}
               </button>

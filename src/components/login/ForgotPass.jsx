@@ -1,6 +1,7 @@
 // import React from 'react'
 import { gql, useMutation } from "@apollo/client";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const FORGOT_PASSWORD = gql`
   mutation ForgotPassword($email: String!) {
@@ -26,8 +27,19 @@ const ForgotPassword = () => {
         variables: {
           email: data.email,
         },
-      });
-    } catch (error) {}
+      })
+        .then((res) => {
+          console.log("🚀 ~ formSubmit ~ res:", res.data);
+          toast.success("please check your email and verify");
+        })
+        .catch((err) => {
+          // console.log("🚀 ~ formSubmit ~ err:", err.message);
+          toast.error(err.message);
+        });
+    } catch (error) {
+      // console.log("🚀 ~ formSubmit ~ error:", error);
+      toast.error(error.message);
+    }
   };
 
   return (
