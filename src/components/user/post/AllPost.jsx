@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -36,6 +36,20 @@ const DELETE_POST = gql`
   }
 `;
 
+const SUBSCRIPTION_POST = gql`
+  subscription NewPostCreated {
+    newPostCreated {
+      keyType
+      data {
+        id
+        title
+        description
+        createdBy
+      }
+    }
+  }
+`;
+
 export default function AllPost() {
   // const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +64,10 @@ export default function AllPost() {
     fetchPolicy: "network-only",
   });
 
+  // const { data: postData } = useSubscription(SUBSCRIPTION_POST);
+
+  // console.log("🚀 ~==========>useSubscription", postData);
+
   const [DeletePost] = useMutation(DELETE_POST);
 
   // useEffect(() => {
@@ -58,13 +76,17 @@ export default function AllPost() {
 
   // console.log("🚀 ~ AllPost ~ data:", data);
   const allPost = data?.getAllPost?.docs;
-  console.log("🚀 ~ AllPost ~ allPost:", allPost?.length);
+  // console.log("🚀 ~ AllPost ~ allPost:", allPost?.length);
   const totalPages = data?.getAllPost?.totalPages || 0;
 
   // Function to handle page change
   const handlePageChange = (selected) => {
     setCurrentPage(selected);
   };
+
+  // useEffect(() => {
+  //   console.log("==========>useSubscription", postData);
+  // }, [postData]);
 
   // delete post
   const deletePostData = async (id) => {
@@ -102,7 +124,7 @@ export default function AllPost() {
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="flex flex justify-end">
+        <div className="flex  justify-end">
           <Link
             to="createPost"
             className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

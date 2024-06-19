@@ -1,1 +1,1 @@
-export const GQL_URL = "http://localhost:5000/graphql";
+export const GQL_URL = "http://localhost:5050/graphql";

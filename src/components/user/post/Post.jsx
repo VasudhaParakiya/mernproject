@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import {
+  gql,
+  useLazyQuery,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
 import InputField from "../../inputAllField/InputField";
 import Button from "../../inputAllField/ButtonField";
 import { useNavigate, useParams } from "react-router";
@@ -40,12 +46,31 @@ const QUERY_SINGLE_POST = gql`
   }
 `;
 
+const SUBSCRIPTION_POST = gql`
+  subscription NewPostCreated {
+    newPostCreated {
+      keyType
+      data {
+        id
+        title
+        description
+        createdBy
+      }
+    }
+  }
+`;
+
 export default function Post() {
   const { id } = useParams();
+  console.log("🚀 ~ Post ~ id:", id);
+
+  const { data: postData1 } = useSubscription(SUBSCRIPTION_POST);
+
+  console.log("🚀 ~==========>useSubscription", postData1);
 
   const [createPost] = useMutation(CREATE_POST);
   const [UpdatePost] = useMutation(UPDATE_POST);
-  const { data: postData } = useQuery(QUERY_SINGLE_POST, {
+  const { data: postData } = useLazyQuery(QUERY_SINGLE_POST, {
     variables: {
       getSinglePostId: id,
     },
